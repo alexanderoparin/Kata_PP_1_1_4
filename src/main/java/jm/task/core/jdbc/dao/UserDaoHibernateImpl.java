@@ -21,14 +21,14 @@ public class UserDaoHibernateImpl implements UserDao {
     public void createUsersTable() {
         Transaction transaction = null;
         try (final Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
+            transaction = session.beginTransaction(); // BEGIN TRANSACTION – служит для определения начала транзакции
             String sql = "CREATE TABLE IF NOT EXISTS users (id INT PRIMARY KEY AUTO_INCREMENT, " +
                     "name VARCHAR(45), lastName VARCHAR(45), age TINYINT(100));";
             session.createSQLQuery(sql).addEntity(User.class).executeUpdate();
-            transaction.commit();
+            transaction.commit(); // COMMIT TRANSACTION – применяет транзакцию
         } catch (Exception e) {
             if (transaction != null) {
-                transaction.rollback();
+                transaction.rollback(); // ROLLBACK TRANSACTION – откатывает все изменения, сделанные в контексте текущей транзакции
             }
         }
         System.out.println("Таблица users создана");
@@ -87,7 +87,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (final Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             userList = session.createQuery("FROM User", User.class).getResultList();
             transaction.commit();
@@ -107,8 +107,7 @@ public class UserDaoHibernateImpl implements UserDao {
         try (final Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             String sql = "TRUNCATE TABLE users;";
-            Query query = session.createSQLQuery(sql);
-            query.executeUpdate();
+            session.createSQLQuery(sql).executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
